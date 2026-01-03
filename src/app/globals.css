@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ========== DARK THEME (DEFAULT) ========== */
+:root,
+:root.dark {
+  --bg-primary: #111113;
+  --bg-secondary: #18181b;
+  --bg-card: rgba(255, 255, 255, 0.02);
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --accent: #22d3ee;
 }
 
+/* ========== LIGHT THEME ========== */
+:root.light {
+  --bg-primary: #f9fafb;
+  /* Slate-50 */
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #111827;
+  /* Gray-900 */
+  --text-secondary: #4b5563;
+  /* Gray-600 */
+  --text-muted: #6b7280;
+  /* Gray-500 */
+  --border-color: #e5e7eb;
+  /* Gray-200 */
+  --accent: #0891b2;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 128, 128, 0.3) transparent;
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+.light {
+  color-scheme: light;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, #0891b2 0%, #2563eb 50%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Grid pattern */
+.dark .grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.light .grid-pattern {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.animated-gradient {
+  background: var(--bg-primary) !important;
+}
+
+/* ========== CODE BLOCKS - ONEDARK (Always Dark) ========== */
+pre {
+  background-color: #282c34 !important;
+  color: #abb2bf !important;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+pre code {
+  color: #abb2bf !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* ========== INLINE CODE - Distinct Styling ========== */
+:not(pre)>code {
+  background: linear-gradient(135deg, #fce7f3 0%, #fae8ff 100%) !important;
+  color: #9d174d !important;
+  padding: 0.15em 0.4em !important;
+  border-radius: 0.375rem;
+  font-size: 0.875em;
+  font-weight: 500;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  border: 1px solid #f9a8d4;
+  white-space: nowrap;
+}
+
+.dark :not(pre)>code {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%) !important;
+  color: #f472b6 !important;
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+/* Prose inline code override */
+.prose code::before,
+.prose code::after {
+  content: none !important;
+}
+
+/* Ensure code blocks are always readable */
+.light pre {
+  color: #abb2bf !important;
+  background-color: #282c34 !important;
 }
