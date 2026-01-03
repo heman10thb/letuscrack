@@ -288,7 +288,7 @@ export function TutorialForm({ initialData, onSubmit, isSaving, onDelete }: Tuto
                                     <div className="mt-2">
                                         <label className={labelClass}>Explanation (optional)</label>
                                         <RichTextEditor
-                                            content={ex.explanation}
+                                            content={ex.explanation || ""}
                                             onChange={(val) => updateExample(i, "explanation", val)}
                                             placeholder="Explanation..."
                                             className="min-h-[80px]"
