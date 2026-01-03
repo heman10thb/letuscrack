@@ -11,7 +11,13 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     const { data: tutorial, error } = await supabase
         .from("tutorials")
-        .select("*, category:categories(*)")
+        .select(`
+            *,
+            category:categories(*),
+            tags:tutorial_tags(
+                tag:tags(*)
+            )
+        `)
         .eq("slug", slug)
         .eq("status", "published")
         .single();
@@ -20,13 +26,20 @@ export async function GET(request: Request, { params }: RouteParams) {
         return NextResponse.json({ error: error.message }, { status: 404 });
     }
 
-    // Increment view count
-    await supabase
+    // Transform tags to flat array
+    const flattenedTutorial = {
+        ...tutorial,
+        tags: tutorial.tags?.map((t: any) => t.tag) || []
+    };
+
+    // Increment view count (fire and forget)
+    supabase
         .from("tutorials")
         .update({ views: tutorial.views + 1 })
-        .eq("id", tutorial.id);
+        .eq("id", tutorial.id)
+        .then(() => { });
 
-    return NextResponse.json({ data: tutorial });
+    return NextResponse.json({ data: flattenedTutorial });
 }
 
 import { validateApiKey, unauthorizedResponse } from "@/lib/apiAuth";
@@ -42,12 +55,38 @@ export async function PUT(req: Request, { params }: RouteParams) {
     const body = await req.json();
     const supabase = createAdminClient();
 
-    const { data, error } = await supabase
+    const { selectedTags, ...tutorialData } = body;
+
+    const { data: updatedData, error } = await supabase
         .from("tutorials")
-        .update(body)
+        .update(tutorialData)
         .eq("slug", slug)
-        .select()
-        .single();
+        .select();
+
+    const data = updatedData ? updatedData[0] : null;
+
+    if (!error && data && selectedTags !== undefined) {
+        // Sync tags: Delete existing and insert new
+        // 1. Delete existing
+        await supabase
+            .from("tutorial_tags")
+            .delete()
+            .eq("tutorial_id", data.id);
+
+        // 2. Insert new if any
+        if (selectedTags.length > 0) {
+            const tagInserts = selectedTags.map((tagId: string) => ({
+                tutorial_id: data.id,
+                tag_id: tagId
+            }));
+
+            const { error: tagError } = await supabase
+                .from("tutorial_tags")
+                .insert(tagInserts);
+
+            if (tagError) console.error("Error inserting tags:", tagError);
+        }
+    }
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

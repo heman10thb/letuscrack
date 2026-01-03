@@ -35,14 +35,33 @@ export async function POST(req: Request) {
     }
 
     // 3. Insert Data
+    const { selectedTags, ...tutorialData } = body;
+
     const { data, error } = await supabase
         .from("tutorials")
-        .insert([body])
+        .insert([tutorialData])
         .select()
         .single();
 
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // 4. Insert Tags if present
+    if (selectedTags && selectedTags.length > 0 && data) {
+        const tagInserts = selectedTags.map((tagId: string) => ({
+            tutorial_id: data.id,
+            tag_id: tagId
+        }));
+
+        const { error: tagError } = await supabase
+            .from("tutorial_tags")
+            .insert(tagInserts);
+
+        if (tagError) {
+            console.error("Error inserting tags:", tagError);
+            // We don't fail the whole request if tags fail, but we log it
+        }
     }
 
     return NextResponse.json({ data }, { status: 201 });

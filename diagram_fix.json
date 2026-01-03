@@ -1,0 +1,7 @@
+{
+    "diagram": {
+        "chart": "flowchart TD\n    A[Start] --> B{\"len(nums1) > len(nums2)?\"}\n    B -- Yes --> C[Swap nums1, nums2]\n    B -- No --> D[Binary Search on nums1]\n    D --> E{Found Partition?}\n    E -- No --> F[Adjust low/high]\n    E -- Yes --> G[Calculate Median]",
+        "title": "Median Search Logic",
+        "explanation": "<p>Ensures we always binary search the smaller array.</p>"
+    }
+}
