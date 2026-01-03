@@ -29,6 +29,8 @@ export interface Example {
 export interface Solution {
     code: string
     explanation: string
+    time_complexity?: string
+    space_complexity?: string
 }
 
 export interface Solutions {
